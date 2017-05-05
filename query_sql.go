@@ -1,32 +1,6 @@
 package lore
 
-import (
-	"errors"
-
-	"github.com/Masterminds/squirrel"
-)
-
-/*
-Select provides the entrypoint for specializing a generic Query as a SELECT query on the table for
-the given ModelInterface. This directly returns a new squirrel.SelectBuilder that can be placed back
-into the Query instance via SetSqlBuilder.
-*/
-func (q *Query) Update(columns ...string) squirrel.SelectBuilder {
-	return newSquirrelStatementBuilder().
-		Select(columns...).
-		From(q.modelInterface.DbTableName())
-}
-
-/*
-Select provides the entrypoint for specializing a generic Query as a SELECT query on the table for
-the given ModelInterface. This directly returns a new squirrel.SelectBuilder that can be placed back
-into the Query instance via SetSqlBuilder.
-*/
-func (q *Query) Delete(columns ...string) squirrel.SelectBuilder {
-	return newSquirrelStatementBuilder().
-		Select(columns...).
-		From(q.modelInterface.DbTableName())
-}
+import "errors"
 
 /*
 SetSqlBuilder sets the Query instance's internal sqlBuilder to the given SqlBuilderInterface

@@ -20,22 +20,24 @@ func TestBuildSqlSelect(t *testing.T) {
 		q.BuildSqlSelect(_TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO).
 			Where(squirrel.Eq{
 				_TEST_DB_FIELDNAME_FIELDONE: testValueWhereFieldOne,
-			}).
-			Where(squirrel.Eq{
 				_TEST_DB_FIELDNAME_FIELDTWO: testValueWhereFieldTwo,
 			}).
 			Limit(limit),
 	)
 
-	// Delegate to SQL test helper.
-	expectedSql := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE %s = $1 AND %s = $2 LIMIT %d",
-		fmt.Sprintf("%s, %s", _TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO),
-		_TEST_DB_TABLENAME,
-		_TEST_DB_FIELDNAME_FIELDONE,
-		_TEST_DB_FIELDNAME_FIELDTWO,
-		limit,
+	// Delegate to SQL test helper with args permutations.
+	testBuildSqlHelperWithArgPermutations(
+		t,
+		q,
+		fmt.Sprintf(
+			"SELECT %s FROM %s WHERE %s = $1 AND %s = $2 LIMIT %d",
+			fmt.Sprintf("%s, %s", _TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO),
+			_TEST_DB_TABLENAME,
+			"%s",
+			"%s",
+			limit,
+		),
+		[]string{_TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO},
+		[]interface{}{testValueWhereFieldOne, testValueWhereFieldTwo},
 	)
-	expectedArgs := []interface{}{testValueWhereFieldOne, testValueWhereFieldTwo}
-	testBuildSqlHelper(t, q, expectedSql, expectedArgs)
 }

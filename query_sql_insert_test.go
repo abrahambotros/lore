@@ -26,7 +26,11 @@ func TestBuildSqlInsertColumnsAndValues(t *testing.T) {
 		_TEST_DB_FIELDNAME_FIELDTWO,
 	)
 	expectedArgs := []interface{}{tmTestValueFieldTwo}
-	testBuildSqlHelper(t, q, expectedSql, expectedArgs)
+	err := testBuildSqlHelper(q, expectedSql, expectedArgs)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 }
 
 func TestBuildSqlInsertModel(t *testing.T) {
@@ -41,19 +45,21 @@ func TestBuildSqlInsertModel(t *testing.T) {
 	q := NewQuery(tm)
 	qSqlBuilder, err := q.BuildSqlInsertModel()
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
+		return
 	}
 	q.SetSqlBuilder(
 		qSqlBuilder.Suffix(RETURNING_STAR),
 	)
 
-	// Delegate to SQL test helper.
-	expectedSql := fmt.Sprintf(
-		"INSERT INTO %s (%s,%s) VALUES ($1,$2) RETURNING *",
-		_TEST_DB_TABLENAME,
-		_TEST_DB_FIELDNAME_FIELDONE,
-		_TEST_DB_FIELDNAME_FIELDTWO,
+	// Delegate to SQL test helper. Note that we need to test the different permutations of the
+	// arguments.
+	expectedSqlBase := "INSERT INTO tests (%s,%s) VALUES ($1,$2) RETURNING *"
+	testBuildSqlHelperWithArgPermutations(
+		t,
+		q,
+		expectedSqlBase,
+		[]string{_TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO},
+		[]interface{}{tm.FieldOne, tm.FieldTwo},
 	)
-	expectedArgs := []interface{}{tm.FieldOne, tm.FieldTwo}
-	testBuildSqlHelper(t, q, expectedSql, expectedArgs)
 }

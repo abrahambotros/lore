@@ -29,7 +29,11 @@ func TestBuildSqlDelete(t *testing.T) {
 		_TEST_DB_FIELDNAME_ID,
 	)
 	expectedArgs := []interface{}{tmTestValueId}
-	testBuildSqlHelper(t, q, expectedSql, expectedArgs)
+	err := testBuildSqlHelper(q, expectedSql, expectedArgs)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 }
 
 func TestBuildSqlDeleteModelByPrimaryKey(t *testing.T) {
@@ -42,7 +46,8 @@ func TestBuildSqlDeleteModelByPrimaryKey(t *testing.T) {
 	q := NewQuery(tm)
 	qSqlBuilder, err := q.BuildSqlDeleteModelByPrimaryKey()
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
+		return
 	}
 	q.SetSqlBuilder(
 		qSqlBuilder.Suffix(RETURNING_STAR),
@@ -55,6 +60,10 @@ func TestBuildSqlDeleteModelByPrimaryKey(t *testing.T) {
 		_TEST_DB_FIELDNAME_ID,
 	)
 	expectedArgs := []interface{}{tmTestValueId}
-	testBuildSqlHelper(t, q, expectedSql, expectedArgs)
+	err = testBuildSqlHelper(q, expectedSql, expectedArgs)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
 }

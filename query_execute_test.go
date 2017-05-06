@@ -36,10 +36,12 @@ func TestExecute(t *testing.T) {
 	dbMock.ExpectExec(fmt.Sprintf("^SELECT \\* FROM %s", _TEST_DB_TABLENAME)).WillReturnResult(sqlmock.NewResult(1, 1))
 	numRowsAffected, err := q.Execute(db)
 	if err != nil {
-		t.Fatalf("Error in Execute: %s", err.Error())
+		t.Errorf("Error in Execute: %s", err.Error())
+		return
 	}
 	if numRowsAffected != 0 {
-		t.Fatalf("Unexpected numRowsAffected (%d) != 0", numRowsAffected)
+		t.Errorf("Unexpected numRowsAffected (%d) != 0", numRowsAffected)
+		return
 	}
 }
 
@@ -61,16 +63,19 @@ func TestExecuteThenParseSingle(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{}))
 	numRowsAffected, err := q.ExecuteThenParseSingle(db, newTestModelEmpty())
 	if err != nil {
-		t.Fatalf("Error in ExecuteThenParseList: %s", err.Error())
+		t.Errorf("Error in ExecuteThenParseList: %s", err.Error())
+		return
 	}
 	if numRowsAffected != 0 {
-		t.Fatalf("Unexpected numRowsAffected (%d) != 0", numRowsAffected)
+		t.Errorf("Unexpected numRowsAffected (%d) != 0", numRowsAffected)
+		return
 	}
 
 	// Should get error if pass in empty list to ExecuteThenParseSingle.
 	_, err = q.ExecuteThenParseSingle(db, newTestModelEmptyList())
 	if err == nil {
-		t.Fatal("Expected error from passing in list instead of single to ExecuteThenParseSingle, but got no such error")
+		t.Error("Expected error from passing in list instead of single to ExecuteThenParseSingle, but got no such error")
+		return
 	}
 }
 
@@ -92,15 +97,18 @@ func TestExecuteThenParseList(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{}))
 	numRowsAffected, err := q.ExecuteThenParseList(db, newTestModelEmptyList())
 	if err != nil {
-		t.Fatalf("Error in ExecuteThenParseList: %s", err.Error())
+		t.Errorf("Error in ExecuteThenParseList: %s", err.Error())
+		return
 	}
 	if numRowsAffected != 0 {
-		t.Fatalf("Unexpected numRowsAffected (%d) != 0", numRowsAffected)
+		t.Errorf("Unexpected numRowsAffected (%d) != 0", numRowsAffected)
+		return
 	}
 
 	// Should get error if pass in empty-but-not-list to ExecuteThenParseList.
 	_, err = q.ExecuteThenParseList(db, newTestModelEmpty())
 	if err == nil {
-		t.Fatal("Expected error from passing in single instead of list to ExecuteThenParseList, but got no such error")
+		t.Error("Expected error from passing in single instead of list to ExecuteThenParseList, but got no such error")
+		return
 	}
 }

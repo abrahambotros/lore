@@ -26,16 +26,45 @@ func TestBuildSqlUpdate(t *testing.T) {
 			Suffix(RETURNING_STAR),
 	)
 
-	// Delegate to SQL test helper.
-	expectedSql := fmt.Sprintf(
-		"UPDATE %s SET %s = $1, %s = $2 WHERE %s = $3 RETURNING *",
-		_TEST_DB_TABLENAME,
-		_TEST_DB_FIELDNAME_FIELDONE,
-		_TEST_DB_FIELDNAME_FIELDTWO,
-		_TEST_DB_FIELDNAME_ID,
-	)
-	expectedArgs := []interface{}{tmTestValueFieldOne, tmTestValueFieldTwo, tmTestValueId}
-	testBuildSqlHelper(t, q, expectedSql, expectedArgs)
+	// Delegate to SQL test helper, but manually handle args permutations since the last arg is
+	// fixed.
+	var expectedSql string
+	var expectedArgs []interface{}
+	expectedSqlBase := "UPDATE %s SET %s = $1, %s = $2 WHERE %s = $3 RETURNING *"
+	var err error
+	for i := 0; i < 2; i++ {
+		if i == 0 {
+			// Forward order for first 2 args, 3rd fixed.
+			expectedSql = fmt.Sprintf(
+				expectedSqlBase,
+				_TEST_DB_TABLENAME,
+				_TEST_DB_FIELDNAME_FIELDONE,
+				_TEST_DB_FIELDNAME_FIELDTWO,
+				_TEST_DB_FIELDNAME_ID,
+			)
+			expectedArgs = []interface{}{tmTestValueFieldOne, tmTestValueFieldTwo, tmTestValueId}
+		} else {
+			// Reverse order for first 2 args, 3rd fixed.
+			expectedSql = fmt.Sprintf(
+				expectedSqlBase,
+				_TEST_DB_TABLENAME,
+				_TEST_DB_FIELDNAME_FIELDTWO,
+				_TEST_DB_FIELDNAME_FIELDONE,
+				_TEST_DB_FIELDNAME_ID,
+			)
+			expectedArgs = []interface{}{tmTestValueFieldTwo, tmTestValueFieldOne, tmTestValueId}
+		}
+		err = testBuildSqlHelper(q, expectedSql, expectedArgs)
+		if err == nil {
+			// If no error, then break immediately.
+			break
+		}
+	}
+	// If still err here, then all permutations failed.
+	if err != nil {
+		t.Errorf("All SQL permutations failed. Last expectedSql: %s. Last expectedArgs: %+v", expectedSql, expectedArgs)
+		return
+	}
 }
 
 func TestBuildSqlUpdateModelByPrimaryKey(t *testing.T) {
@@ -52,21 +81,49 @@ func TestBuildSqlUpdateModelByPrimaryKey(t *testing.T) {
 	q := NewQuery(tm)
 	qSqlBuilder, err := q.BuildSqlUpdateModelByPrimaryKey()
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
+		return
 	}
 	q.SetSqlBuilder(
 		qSqlBuilder.Suffix(RETURNING_STAR),
 	)
 
-	// Delegate to SQL test helper.
-	expectedSql := fmt.Sprintf(
-		"UPDATE %s SET %s = $1, %s = $2 WHERE %s = $3 RETURNING *",
-		_TEST_DB_TABLENAME,
-		_TEST_DB_FIELDNAME_FIELDONE,
-		_TEST_DB_FIELDNAME_FIELDTWO,
-		_TEST_DB_FIELDNAME_ID,
-	)
-	expectedArgs := []interface{}{tmTestValueFieldOne, tmTestValueFieldTwo, tmTestValueId}
-	testBuildSqlHelper(t, q, expectedSql, expectedArgs)
-
+	// Delegate to SQL test helper, but manually handle args permutations since the last arg is
+	// fixed.
+	var expectedSql string
+	var expectedArgs []interface{}
+	expectedSqlBase := "UPDATE %s SET %s = $1, %s = $2 WHERE %s = $3 RETURNING *"
+	for i := 0; i < 2; i++ {
+		if i == 0 {
+			// Forward order for first 2 args, 3rd fixed.
+			expectedSql = fmt.Sprintf(
+				expectedSqlBase,
+				_TEST_DB_TABLENAME,
+				_TEST_DB_FIELDNAME_FIELDONE,
+				_TEST_DB_FIELDNAME_FIELDTWO,
+				_TEST_DB_FIELDNAME_ID,
+			)
+			expectedArgs = []interface{}{tm.FieldOne, tm.FieldTwo, tm.Id}
+		} else {
+			// Reverse order for first 2 args, 3rd fixed.
+			expectedSql = fmt.Sprintf(
+				expectedSqlBase,
+				_TEST_DB_TABLENAME,
+				_TEST_DB_FIELDNAME_FIELDTWO,
+				_TEST_DB_FIELDNAME_FIELDONE,
+				_TEST_DB_FIELDNAME_ID,
+			)
+			expectedArgs = []interface{}{tm.FieldTwo, tm.FieldOne, tm.Id}
+		}
+		err = testBuildSqlHelper(q, expectedSql, expectedArgs)
+		if err == nil {
+			// If no error, then break immediately.
+			break
+		}
+	}
+	// If still err here, then all permutations failed.
+	if err != nil {
+		t.Errorf("All SQL permutations failed. Last expectedSql: %s. Last expectedArgs: %+v", expectedSql, expectedArgs)
+		return
+	}
 }

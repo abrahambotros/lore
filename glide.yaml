@@ -1,8 +1,0 @@
-package: github.com/abrahambotros/lore
-import:
-- package: github.com/Masterminds/squirrel
-  version: 20f192218cf52a73397fa2df45bdda720f3e47c8
-- package: github.com/jmoiron/sqlx
-  version: d9bd385d68c068f1fabb5057e3dedcbcbb039d0f
-- package: github.com/DATA-DOG/go-sqlmock
-  version: 18ab7ac1c7ac8c73f4a8d6dde2d7fc10a1d0c53a

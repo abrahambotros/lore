@@ -17,9 +17,6 @@ Aside from this, you're in charge of your own schema, migration, etc. - no full 
 
 Lastly, while I'm sure it could still be improved, I've tried (and will continue to try) to ensure documentation provides full transparency of what is going on, so that your lore is entirely in your control.
 
-## Requirements
-I highly suggest using Go 1.6+ for vendoring, as this library uses exact vendor versions (via [Glide](https://github.com/Masterminds/glide), which you should also check out!) to avoid any dependency/versioning issues down the road. You're probably ok without vendoring, but yeah, YMMV.
-
 ## Examples
 Below is a quick run-through of some simple examples. Check GoDoc documentation for more information on any item, and look through the test source files for more thorough examples of usage. I also recommend using string constants everywhere for your db field names (string literals everywhere are literally the devil and should be banned from your lore IMO - pun intended), but am just using literals here ONLY for simplicity and succinctness.
 

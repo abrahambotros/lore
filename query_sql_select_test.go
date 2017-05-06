@@ -10,34 +10,33 @@ import (
 func TestBuildSqlSelect(t *testing.T) {
 	SetConfigDefault()
 	tm := createTestModelInstance()
-	testValueWhereFieldOne := 1
-	testValueWhereFieldTwo := "Two"
+	testValueWhereField := 2
 	limit := uint64(10)
 
 	// Build query and SQL.
 	q := NewQuery(tm)
 	q.SetSqlBuilder(
-		q.BuildSqlSelect(_TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO).
+		q.BuildSqlSelect(_TEST_DB_FIELDNAME_ID).
 			Where(squirrel.Eq{
-				_TEST_DB_FIELDNAME_FIELDONE: testValueWhereFieldOne,
-				_TEST_DB_FIELDNAME_FIELDTWO: testValueWhereFieldTwo,
+				_TEST_DB_FIELDNAME_FIELD: testValueWhereField,
 			}).
 			Limit(limit),
 	)
 
-	// Delegate to SQL test helper with args permutations.
-	testBuildSqlHelperWithArgPermutations(
-		t,
+	// Delegate to SQL test helper.
+	err := testBuildSqlHelper(
 		q,
 		fmt.Sprintf(
-			"SELECT %s FROM %s WHERE %s = $1 AND %s = $2 LIMIT %d",
-			fmt.Sprintf("%s, %s", _TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO),
+			"SELECT %s FROM %s WHERE %s = $1 LIMIT %d",
+			_TEST_DB_FIELDNAME_ID,
 			_TEST_DB_TABLENAME,
-			"%s",
-			"%s",
+			_TEST_DB_FIELDNAME_FIELD,
 			limit,
 		),
-		[]string{_TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO},
-		[]interface{}{testValueWhereFieldOne, testValueWhereFieldTwo},
+		[]interface{}{testValueWhereField},
 	)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 }

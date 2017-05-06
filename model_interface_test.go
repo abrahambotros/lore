@@ -3,19 +3,16 @@ package lore
 import "testing"
 
 const (
-	_TEST_DB_TABLENAME          string = "tests"
-	_TEST_DB_FIELDNAME_ID       string = "id"
-	_TEST_DB_FIELDNAME_FIELDONE string = "field_one"
-	_TEST_DB_FIELDNAME_FIELDTWO string = "field_two"
-	_TEST_MODEL_ID              int    = 1
-	_TEST_MODEL_FIELD_ONE       int64  = 1
-	_TEST_MODEL_FIELD_TWO       string = "Two"
+	_TEST_DB_TABLENAME       string = "tests"
+	_TEST_DB_FIELDNAME_ID    string = "id"
+	_TEST_DB_FIELDNAME_FIELD string = "field"
+	_TEST_MODEL_ID           int    = 1
+	_TEST_MODEL_FIELD        int64  = 2
 )
 
 type testModel struct {
-	Id       int    `db:"id"`
-	FieldOne int64  `db:"field_one"`
-	FieldTwo string `db:"field_two"`
+	Id    int   `db:"id"`
+	Field int64 `db:"field"`
 }
 
 /*
@@ -35,8 +32,7 @@ DbFieldMap implementation for ModelInterface.
 */
 func (tm *testModel) DbFieldMap() map[string]interface{} {
 	return map[string]interface{}{
-		_TEST_DB_FIELDNAME_FIELDONE: tm.FieldOne,
-		_TEST_DB_FIELDNAME_FIELDTWO: tm.FieldTwo,
+		_TEST_DB_FIELDNAME_FIELD: tm.Field,
 	}
 }
 
@@ -59,9 +55,8 @@ createTestModelInstance creates a new testModel instance with valid values.
 */
 func createTestModelInstance() *testModel {
 	return &testModel{
-		Id:       _TEST_MODEL_ID,
-		FieldOne: _TEST_MODEL_FIELD_ONE,
-		FieldTwo: _TEST_MODEL_FIELD_TWO,
+		Id:    _TEST_MODEL_ID,
+		Field: _TEST_MODEL_FIELD,
 	}
 }
 
@@ -91,7 +86,7 @@ func TestModelInterfaceInstance(t *testing.T) {
 
 	// Test field map.
 	dbFieldMap := mi.DbFieldMap()
-	if len(dbFieldMap) != 2 || dbFieldMap[_TEST_DB_FIELDNAME_FIELDONE] != tm.FieldOne || dbFieldMap[_TEST_DB_FIELDNAME_FIELDTWO] != tm.FieldTwo {
+	if len(dbFieldMap) != 1 || dbFieldMap[_TEST_DB_FIELDNAME_FIELD] != tm.Field {
 		t.Errorf("Invalid DbFieldMap: %+v", dbFieldMap)
 		return
 	}

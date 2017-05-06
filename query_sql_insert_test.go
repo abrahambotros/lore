@@ -8,14 +8,14 @@ import (
 func TestBuildSqlInsertColumnsAndValues(t *testing.T) {
 	SetConfigDefault()
 	tm := createTestModelInstance()
-	tmTestValueFieldTwo := fmt.Sprintf("%s-%s", tm.FieldTwo, "Two")
+	tmTestValueField := tm.Field*2 + 1
 
 	// Build query and SQL.
 	q := NewQuery(tm)
 	q.SetSqlBuilder(
 		q.BuildSqlInsertColumnsAndValues(
-			[]string{_TEST_DB_FIELDNAME_FIELDTWO},
-			[]interface{}{tmTestValueFieldTwo},
+			[]string{_TEST_DB_FIELDNAME_FIELD},
+			[]interface{}{tmTestValueField},
 		).Suffix(RETURNING_STAR),
 	)
 
@@ -23,9 +23,9 @@ func TestBuildSqlInsertColumnsAndValues(t *testing.T) {
 	expectedSql := fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES ($1) RETURNING *",
 		_TEST_DB_TABLENAME,
-		_TEST_DB_FIELDNAME_FIELDTWO,
+		_TEST_DB_FIELDNAME_FIELD,
 	)
-	expectedArgs := []interface{}{tmTestValueFieldTwo}
+	expectedArgs := []interface{}{tmTestValueField}
 	err := testBuildSqlHelper(q, expectedSql, expectedArgs)
 	if err != nil {
 		t.Error(err)
@@ -36,10 +36,8 @@ func TestBuildSqlInsertColumnsAndValues(t *testing.T) {
 func TestBuildSqlInsertModel(t *testing.T) {
 	SetConfigDefault()
 	tm := createTestModelInstance()
-	tmTestValueFieldOne := tm.FieldOne*2 + 1
-	tmTestValueFieldTwo := fmt.Sprintf("%s-%s", tm.FieldTwo, "Two")
-	tm.FieldOne = tmTestValueFieldOne
-	tm.FieldTwo = tmTestValueFieldTwo
+	tmTestValueField := tm.Field*2 + 1
+	tm.Field = tmTestValueField
 
 	// Build query and SQL.
 	q := NewQuery(tm)
@@ -52,14 +50,17 @@ func TestBuildSqlInsertModel(t *testing.T) {
 		qSqlBuilder.Suffix(RETURNING_STAR),
 	)
 
-	// Delegate to SQL test helper. Note that we need to test the different permutations of the
-	// arguments.
-	expectedSqlBase := "INSERT INTO tests (%s,%s) VALUES ($1,$2) RETURNING *"
-	testBuildSqlHelperWithArgPermutations(
-		t,
+	// Delegate to SQL test helper.
+	err = testBuildSqlHelper(
 		q,
-		expectedSqlBase,
-		[]string{_TEST_DB_FIELDNAME_FIELDONE, _TEST_DB_FIELDNAME_FIELDTWO},
-		[]interface{}{tm.FieldOne, tm.FieldTwo},
+		fmt.Sprintf(
+			"INSERT INTO tests (%s) VALUES ($1) RETURNING *",
+			_TEST_DB_FIELDNAME_FIELD,
+		),
+		[]interface{}{tm.Field},
 	)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 }

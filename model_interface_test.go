@@ -8,14 +8,14 @@ const (
 	_TEST_DB_FIELDNAME_FIELDONE string = "field_one"
 	_TEST_DB_FIELDNAME_FIELDTWO string = "field_two"
 	_TEST_MODEL_ID              int    = 1
-	_TEST_MODEL_FIELD_ONE       int64  = 2
+	_TEST_MODEL_FIELD_ONE       int64  = 1
 	_TEST_MODEL_FIELD_TWO       string = "Two"
 )
 
 type testModel struct {
-	Id       int    `lore:"id"`
-	FieldOne int64  `lore:"field_one"`
-	FieldTwo string `lore:"field_two"`
+	Id       int    `db:"id"`
+	FieldOne int64  `db:"field_one"`
+	FieldTwo string `db:"field_two"`
 }
 
 /*
@@ -53,20 +53,6 @@ DbPimraryFieldValue implementation for ModelInterface.
 func (tm *testModel) DbPrimaryFieldValue() interface{} {
 	return _TEST_MODEL_ID
 }
-
-// /*
-// NewEmptyInterface implementation for ModelInterface.
-// */
-// func (tm *testModel) NewEmptyInterface() interface{} {
-// 	return &testModel{}
-// }
-
-// /*
-// NewEmptyInterfaceSlice implementation for ModelInterface.
-// */
-// func (tm *testModel) NewEmptyInterfaceSlice() interface{} {
-// 	return &[]testModel{}
-// }
 
 /*
 createTestModelInstance creates a new testModel instance with valid values.
@@ -106,24 +92,6 @@ func TestModelInterfaceInstance(t *testing.T) {
 	if len(dbFieldMap) != 2 || dbFieldMap[_TEST_DB_FIELDNAME_FIELDONE] != tm.FieldOne || dbFieldMap[_TEST_DB_FIELDNAME_FIELDTWO] != tm.FieldTwo {
 		t.Fatalf("Invalid DbFieldMap: %+v", dbFieldMap)
 	}
-
-	// // Test NewEmptyInterface.
-	// newEmptyInterface := mi.NewEmptyInterface()
-	// tmi, ok := newEmptyInterface.(*testModel)
-	// if !ok || tmi == nil {
-	// 	t.Fatalf("Error casting NewEmptyInterface() result back to test model")
-	// }
-
-	// // Test NewEmptyInterfaceSlice.
-	// newEmptyInterfaceSlice := mi.NewEmptyInterfaceSlice()
-	// tmis, ok := newEmptyInterfaceSlice.(*[]testModel)
-	// if !ok || tmis == nil {
-	// 	t.Fatalf("Error casting NewEmptyInterfaceSlice() result back to test model slice")
-	// }
-	// if len(*tmis) != 0 {
-	// 	t.Fatalf("Error casting NewEmptyInterfaceSlice() result back to test model slice: invalid length:%d", len(*tmis))
-	// }
-
 }
 
 /*

@@ -12,11 +12,25 @@ const (
 )
 
 /*
+isPointer returns true if the given interface is a pointer; false otherwise.
+*/
+func isPointer(i interface{}) bool {
+	return reflect.ValueOf(i).Kind() == reflect.Ptr
+}
+
+/*
+isPointerToSlice returns true if the given interface is a pointer to a slice; false otherwise.
+*/
+func isPointerToSlice(i interface{}) bool {
+	return isPointer(i) && reflect.TypeOf(reflect.ValueOf(i).Elem().Interface()).Kind() == reflect.Slice
+}
+
+/*
 getPointerSliceLength returns the length of the slice pointed to by the given pointer. If the
 underlying object is not a slice, an error is returned.
 */
 func getPointerSliceLength(i interface{}) (int, error) {
-	if reflect.TypeOf(reflect.ValueOf(i).Elem().Interface()).Kind() == reflect.Slice {
+	if isPointerToSlice(i) {
 		return reflect.ValueOf(i).Elem().Len(), nil
 	}
 

@@ -19,7 +19,7 @@ func (q *Query) BuildSqlDelete() squirrel.DeleteBuilder {
 
 /*
 BuildSqlDeleteModelByPrimaryKey wraps BuildSqlDelete to perform the delete on the table row with the
-matching primary key/value of this ModelInterface's model instance. Alias for
+matching primary key/value of this Query's ModelInterface's model instance. Alias for
 query.BuildSqlDelete().Where(<primary key and value>).
 */
 func (q *Query) BuildSqlDeleteModelByPrimaryKey() (squirrel.DeleteBuilder, error) {

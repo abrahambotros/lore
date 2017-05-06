@@ -19,7 +19,7 @@ func (q *Query) BuildSqlUpdate() squirrel.UpdateBuilder {
 
 /*
 BuildSqlUpdateModelByPrimaryKey wraps BuildSqlUpdate to perform the update with the given columns
-and values defined by the ModelInterface's DbFieldMap on the table row with the matching
+and values defined by the Query's ModelInterface's DbFieldMap on the table row with the matching
 primary key/value for this ModelInterface's model instance. Alias for
 query.BuildSqlUpdate().Where(<primary key and value>).Set(<columns and values according to DbFieldMap>).
 */

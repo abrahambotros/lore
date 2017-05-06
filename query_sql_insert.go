@@ -23,12 +23,12 @@ func (q *Query) BuildSqlInsertColumnsAndValues(columns []string, values []interf
 
 /*
 BuildSqlInsertModel wraps BuildSqlInsert with the given ModelInterface's DbFieldMap as the INSERT
-query's columns and values. Alias for
+query's columns and values. Uses the ModelInterface the Query was originally created with. Alias for
 query.BuildSqlInsertColumnsAndValues(<model's DbFieldMap keys>, <model's DbFieldMap values>).
 */
-func (q *Query) BuildSqlInsertModel(mi ModelInterface) (squirrel.InsertBuilder, error) {
+func (q *Query) BuildSqlInsertModel() (squirrel.InsertBuilder, error) {
 	// Parse columns and values from model's DbFieldMap.
-	columns, values, err := getMapKeysVals(mi.DbFieldMap())
+	columns, values, err := getMapKeysVals(q.modelInterface.DbFieldMap())
 	if err != nil {
 		return q.BuildSqlInsert(), err
 	}

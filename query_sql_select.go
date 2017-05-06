@@ -17,6 +17,6 @@ func (q *Query) BuildSqlSelect(columns ...string) squirrel.SelectBuilder {
 /*
 BuildSqlSelectStar wraps BuildSqlSelect as a SELECT * query. Alias for query.BuildSqlSelect("*").
 */
-func (q *Query) BuilSqlSelectStar() squirrel.SelectBuilder {
+func (q *Query) BuildSqlSelectStar() squirrel.SelectBuilder {
 	return q.BuildSqlSelect(STAR)
 }

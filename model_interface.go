@@ -25,17 +25,6 @@ type ModelInterface interface {
 		columns and values to write into the table row.
 	*/
 	DbFieldMap() map[string]interface{}
-	// /*
-	// 	NewEmptyInterface returns a POINTER to an empty instance of the concrete Model that
-	// 	implements this interface. This is used for scanning results from DB queries into a new
-	// 	empty model instance.
-	// */
-	// NewEmptyInterface() interface{}
-	// /*
-	// 	NewEmptyInterfaceSlice returns a POINTER to an empty list for the concrete Model's type.
-	// 	This is used for scanning results from DB queries into a new empty list of model instances.
-	// */
-	// NewEmptyInterfaceSlice() interface{}
 	/*
 		DbPrimaryFieldKey returns a string indicating the column name of the primary field of the
 		model. This is used for Update and Delete queries for the WHERE condition.

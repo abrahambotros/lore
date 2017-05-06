@@ -17,23 +17,50 @@ const (
 )
 
 /*
-ExecuteThenParseSingle ...
+Execute wraps sqlx.DB.Exec, and does not parse the result into any struct. However, it still returns
+the basic info of numRowsAffected IN SOME CASES (see below).
 
-TODO: Note that handle sql.ErrNoRows and return nil instead.
+NOTE: As mentioned at http://jmoiron.github.io/sqlx/#exec access to numRowsAffected (via
+sqlx.Result.RowsAffected) is db-driver-dependent.
 */
-func (q *Query) ExecuteThenParseSingle(db *sqlx.DB, resultSingle interface{}) (numRowsAffected int, err error) {
-	return q.execute(db, resultSingle, _EXECUTE_MODE_PARSE_SINGLE)
+func (q *Query) Execute(db *sqlx.DB) (numRowsAffected int, err error) {
+	return q.execute(db, nil, _EXECUTE_MODE_NO_PARSE)
 }
 
 /*
-ExecuteThenParseList ...
+ExecuteThenParseSingle wraps sqlx.DB.Get to execute the query and then parse the result into the
+given single struct in resultSinglePtr. Scanning the db results into the result interface is done
+according to typical sqlx scanning behavior for sqlx.DB.Get.
 
-TODO: Note resultList should be POINTER to list.
+When sql.ErrNoRows is encountered by the underlying sqlx.DB.Get query (any time no matching row is
+found for this query), this function returns 0 rows affected (naturally), but DOES NOT RETURN ANY
+ERROR.
 
-TODO: Note warning of Select vs Queryx - should be bounded.
+Note that resultSinglePtr should be a POINTER TO A SINGLE STRUCT that you want to scan the results
+into. An error will be returned if resultSinglePtr is not detected as a pointer to a single struct.
+
+See comments for Execute function for more information about numRowsAffected.
 */
-func (q *Query) ExecuteThenParseList(db *sqlx.DB, resultList interface{}) (numRowsAffected int, err error) {
-	return q.execute(db, resultList, _EXECUTE_MODE_PARSE_LIST)
+func (q *Query) ExecuteThenParseSingle(db *sqlx.DB, resultSinglePtr interface{}) (numRowsAffected int, err error) {
+	return q.execute(db, resultSinglePtr, _EXECUTE_MODE_PARSE_SINGLE)
+}
+
+/*
+ExecuteThenParseList wraps sqlx.DB.Select to execute the query and then parse the result into the
+given list of structs in resultSinglePtr. Scanning the db results into the result interface is done
+according to typical sqlx scanning behavior for sqlx.DB.Select.
+
+Note that resultListPtr should be a POINTER TO A LIST OF STRUCTS that you want to scan the results
+into. An error will be returned if resultListPtr is not detected as a pointer to a list.
+
+See comments for Execute function for more information about numRowsAffected.
+
+NOTE: Any callers of this function should ensure the underlying query is appropriately bounded, as
+sqlx.DB.Select will load the entire result set into memory at once; see
+http://jmoiron.github.io/sqlx/#getAndSelect for more information.
+*/
+func (q *Query) ExecuteThenParseList(db *sqlx.DB, resultListPtr interface{}) (numRowsAffected int, err error) {
+	return q.execute(db, resultListPtr, _EXECUTE_MODE_PARSE_LIST)
 }
 
 /*
@@ -41,13 +68,22 @@ execute ...
 
 TODO: Sets result to nil if
 */
-func (q *Query) execute(db *sqlx.DB, result interface{}, mode executeMode) (numRowsAffected int, err error) {
+func (q *Query) execute(db *sqlx.DB, resultPtr interface{}, mode executeMode) (numRowsAffected int, err error) {
 	// Handle invalid input.
 	if db == nil {
 		return 0, errors.New("db cannot be nil")
 	}
 	if mode != _EXECUTE_MODE_NO_PARSE && mode != _EXECUTE_MODE_PARSE_SINGLE && mode != _EXECUTE_MODE_PARSE_LIST {
 		return 0, fmt.Errorf("Invalid execute mode: %d", mode)
+	}
+	if mode == _EXECUTE_MODE_PARSE_SINGLE {
+		if !isPointer(resultPtr) || isPointerToSlice(resultPtr) {
+			return 0, fmt.Errorf("Result pointer cannot point to slice when in ParseSingle mode. ResultPtr: %+v", resultPtr)
+		}
+	} else if mode == _EXECUTE_MODE_PARSE_LIST {
+		if !isPointer(resultPtr) || !isPointerToSlice(resultPtr) {
+			return 0, fmt.Errorf("Result pointer must point to slice when in ParseList mode. ResultPtr: %+v", resultPtr)
+		}
 	}
 
 	// Get SQL.
@@ -60,9 +96,9 @@ func (q *Query) execute(db *sqlx.DB, result interface{}, mode executeMode) (numR
 	if mode == _EXECUTE_MODE_NO_PARSE {
 		_, err = db.Exec(qSql, qSqlArgs...)
 	} else if mode == _EXECUTE_MODE_PARSE_SINGLE {
-		err = db.Get(result, qSql, qSqlArgs...)
+		err = db.Get(resultPtr, qSql, qSqlArgs...)
 	} else if mode == _EXECUTE_MODE_PARSE_LIST {
-		err = db.Select(result, qSql, qSqlArgs...)
+		err = db.Select(resultPtr, qSql, qSqlArgs...)
 	}
 
 	// Handle any specific soft errors.
@@ -85,7 +121,7 @@ func (q *Query) execute(db *sqlx.DB, result interface{}, mode executeMode) (numR
 	} else if mode == _EXECUTE_MODE_PARSE_LIST {
 		// Otherwise, if in multi mode, then explicitly count number of items returned via
 		// reflection, assuming the input was indeed a pointer to a slice.
-		numRowsAffected, err = getPointerSliceLength(result)
+		numRowsAffected, err = getPointerSliceLength(resultPtr)
 		if err != nil {
 			return 0, err
 		}

@@ -24,6 +24,13 @@ I highly suggest using Go 1.6+ for vendoring, as this library uses exact vendor 
 Below is a quick run-through of some simple examples. Check GoDoc documentation for more information on any item, and look through the test source files for more thorough examples of usage. I also recommend using string constants everywhere for your db field names (string literals everywhere are literally the devil and should be banned from your lore IMO - pun intended), but am just using literals here ONLY for simplicity and succinctness.
 
 ```go
+// Set LORE config for all future queries created via LORE. Can be updated at any time. As of May
+// 2017, the config only determines the SQL placeholder format (as in Squirrel).
+lore.SetConfigDefault() // Set default config (currently dollar/$# format)
+lore.SetConfig(&lore.Config{
+    SQLPlaceholderFormat: lore.SQLPlaceholderFormatDollar,
+})
+
 // Define a model that implements lore.ModelInterface. Use "db:" tags for SQLX directly.
 type Legend struct {
     Id      int     `db:"id"` // Serial/auto-incrementing primary key
@@ -52,7 +59,7 @@ func (l *Legend) DbPrimaryFieldValue() interface{} {
  * SELECT * FROM legends WHERE name = 'Mars' AND culture = 'Roman' LIMIT 1;
  */
 // Create a Query with the given ModelInterface model.
-q := NewQuery(&Legend{})
+q := lore.NewQuery(&Legend{})
 // Build the SQL via the BuildSqlSelectStar entrypoint, then finish building via Squirrel. Set it
 // back into the Query via SetSqlBuilder, indicating this is the SQL that will be run when the Query
 // is executed.
@@ -79,7 +86,7 @@ qSql, qArgs, err := q.ToSql()
 db := getDb() // ... Your own lore should conjure up a *sqlx.DB instance here.
 discoveredLegend := &Legend{}
 // See notes for numRowsAffected in Query.Execute documentation.
-numRowsAffected, err := db.ExecuteThenParseSingle(db, discoveredLegend)
+numRowsAffected, err := q.ExecuteThenParseSingle(db, discoveredLegend)
 if err != nil {
     // Handle errors here.
 }
@@ -115,3 +122,4 @@ LORE is a major WIP. Contributions are welcome, but use in production is caution
 * Allow using sqlx QueryRow/QueryRowX for large/unrestricted-length queries instead of just Get/Select.
 * Better tests, especially for Execute\* methods.
 * Consider better way to relate updates to SQL-builders to the parent query without having to call `SetSqlBuilder` every time.
+* Dedicated examples in GoDoc.

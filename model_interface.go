@@ -1,11 +1,5 @@
 package lore
 
-// TODO: CLEANUP
-// /*
-// Model provides a base model definition.
-// */
-// type Model struct{}
-
 /*
 ModelInterface provides a generic interface for enabling external models to interface with internal
 machinery here.
@@ -49,30 +43,3 @@ type ModelInterface interface {
 	*/
 	DbPrimaryFieldValue() interface{}
 }
-
-/**
- * TODO: JUMP
- * - In README, instruct to send result as in sqlx...
- */
-
-// TODO: REMOVE
-// /*
-// dbColumnValueMap parses the Model's fields and tags to build a map from column (name) to value for
-// columns that are marked for LORE consumption.
-// */
-// func (m *Model) dbColumnValueMap() map[string]interface{} {
-// 	// Parse model.
-// 	mValue := reflect.ValueOf(m)
-// 	mType := mValue.Type()
-// 	mNumFields := mValue.NumField()
-
-// 	// Init return map.
-// 	cvm := map[string]interface{}{}
-
-// 	// Iterate model fields.
-// 	for i := 0; i < mNumFields; i++ {
-// 		// TODO: Use fatih/structs
-// 		mType.Field(i).Name
-// 		mValue.Field(i).Interface()
-// 	}
-// }

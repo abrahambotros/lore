@@ -64,9 +64,12 @@ func (q *Query) ExecuteThenParseList(db *sqlx.DB, resultListPtr interface{}) (nu
 }
 
 /*
-execute ...
+execute provides the underlying execute functionality for executing SQL on a sqlx.DB. When mode is
+NO_PARSE, just calls db.Exec; when PARSE_SINGLE, calls db.Get; when PARSE_LIST, calls db.Select.
 
-TODO: Sets result to nil if
+Note that in the PARSE_SINGLE case, when sql.ErrNoRows is encountered by the underlying sqlx.DB.Get
+query (any time no matching row is found for this query), this function returns 0 rows affected
+(naturally), but DOES NOT RETURN ANY ERROR.
 */
 func (q *Query) execute(db *sqlx.DB, resultPtr interface{}, mode executeMode) (numRowsAffected int, err error) {
 	// Handle invalid input.

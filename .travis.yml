@@ -6,5 +6,6 @@ go:
   - 1.8
   - master
 
+# Instruct go get to also install test dependencies (namely go-sqlmock).
 install:
-  - go get
+  - go get -t

@@ -123,3 +123,6 @@ LORE is a major WIP. Contributions are welcome, but use in production is caution
 * Better tests, especially for Execute\* methods.
 * Consider better way to relate updates to SQL-builders to the parent query without having to call `SetSqlBuilder` every time.
 * Dedicated examples in GoDoc.
+
+## Final notes
+Thanks for looking, and please feel free to message me if you're having any problems with LORE! I'm also always open to suggestions on ways to improve LORE, whether minor changes/fixes or even large rewrites - always happy to learn of better ways to do things!

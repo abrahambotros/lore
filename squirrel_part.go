@@ -7,24 +7,24 @@ import (
 )
 
 /*
-part is directly imported from Squirrel.
+sqlPart is directly imported from Squirrel.part.
 */
-type part struct {
+type sqlPart struct {
 	pred interface{}
 	args []interface{}
 }
 
 /*
-newPart is directly imported from Squirrel.
+newSqlPart is directly imported from Squirrel.newPart.
 */
-func newPart(pred interface{}, args ...interface{}) squirrel.Sqlizer {
-	return &part{pred, args}
+func newSqlPart(pred interface{}, args ...interface{}) *sqlPart {
+	return &sqlPart{pred, args}
 }
 
 /*
-ToSql is directly imported from Squirrel.
+ToSql is directly imported from Squirrel.part.ToSql.
 */
-func (p part) ToSql() (sql string, args []interface{}, err error) {
+func (p sqlPart) ToSql() (sql string, args []interface{}, err error) {
 	switch pred := p.pred.(type) {
 	case nil:
 		// no-op

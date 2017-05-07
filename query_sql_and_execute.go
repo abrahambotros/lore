@@ -44,7 +44,7 @@ typically something like a squirrel.Eq instance, etc.
 
 `SELECT * FROM <table> WHERE <where conditions> LIMIT 1;`
 */
-func SelectModelWhere(mi ModelInterface, db *sqlx.DB, where *part, resultSinglePtr interface{}) (found bool, err error) {
+func SelectModelWhere(mi ModelInterface, db *sqlx.DB, where *sqlPart, resultSinglePtr interface{}) (found bool, err error) {
 	// Build query.
 	q := NewQuery(mi)
 	qSqlBuilder := q.BuildSqlSelectStar()
@@ -67,7 +67,7 @@ otherwise, the underlying limit uint64 is applied.
 
 `SELECT * FROM <table> WHERE <where conditions> LIMIT <limit>;`
 */
-func SelectModelsWhere(mi ModelInterface, db *sqlx.DB, where *part, limit *uint64, resultListPtr interface{}) (numRowsAffected uint64, err error) {
+func SelectModelsWhere(mi ModelInterface, db *sqlx.DB, where *sqlPart, limit *uint64, resultListPtr interface{}) (numRowsAffected uint64, err error) {
 	// Build query.
 	q := NewQuery(mi)
 	qSqlBuilder := q.BuildSqlSelectStar()
@@ -141,7 +141,7 @@ typically something like a squirrel.Eq instance, etc.
 
 `UPDATE <table> SET <columns and values from map> WHERE <where conditions> RETURNING * ;`
 */
-func UpdateSetMapWhere(mi ModelInterface, db *sqlx.DB, m map[string]interface{}, where *part, resultListPtr interface{}) (numRowsAffected uint64, err error) {
+func UpdateSetMapWhere(mi ModelInterface, db *sqlx.DB, m map[string]interface{}, where *sqlPart, resultListPtr interface{}) (numRowsAffected uint64, err error) {
 	// Build query.
 	q := NewQuery(mi)
 	qSqlBuilder := q.BuildSqlUpdateSetMap(m)
@@ -189,7 +189,7 @@ typically something like a squirrel.Eq instance, etc.
 
 `DELETE FROM <table> WHERE <where conditions> RETURNING * ;`
 */
-func DeleteModelsWhere(mi ModelInterface, db *sqlx.DB, where *part, resultListPtr interface{}) (numRowsAffected uint64, err error) {
+func DeleteModelsWhere(mi ModelInterface, db *sqlx.DB, where *sqlPart, resultListPtr interface{}) (numRowsAffected uint64, err error) {
 	// Build query.
 	q := NewQuery(mi)
 	qSqlBuilder := q.BuildSqlDelete()

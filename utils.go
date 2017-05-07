@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	STAR           string = "*"
-	RETURNING_STAR string = "RETURNING *"
+	STAR                   string = "*"
+	RETURNING_STAR         string = "RETURNING *"
+	_ERR_EMPTY_PRIMARY_KEY string = "Empty primary key encountered; cannot perform functions requiring primary keys"
 )
 
 /*
@@ -29,9 +30,9 @@ func isPointerToSlice(i interface{}) bool {
 getPointerSliceLength returns the length of the slice pointed to by the given pointer. If the
 underlying object is not a slice, an error is returned.
 */
-func getPointerSliceLength(i interface{}) (int, error) {
+func getPointerSliceLength(i interface{}) (uint64, error) {
 	if isPointerToSlice(i) {
-		return reflect.ValueOf(i).Elem().Len(), nil
+		return uint64(reflect.ValueOf(i).Elem().Len()), nil
 	}
 
 	// If reach here, then i was not a pointer to a slice; return error.

@@ -39,8 +39,8 @@ func TestExecute(t *testing.T) {
 		t.Errorf("Error in Execute: %s", err.Error())
 		return
 	}
-	if numRowsAffected != 0 {
-		t.Errorf("Unexpected numRowsAffected (%d) != 0", numRowsAffected)
+	if numRowsAffected != 1 {
+		t.Errorf("Unexpected numRowsAffected (%d) != 1", numRowsAffected)
 		return
 	}
 }
@@ -61,13 +61,13 @@ func TestExecuteThenParseSingle(t *testing.T) {
 	db, dbMock := getTestSqlxDb(t)
 	dbMock.ExpectQuery(fmt.Sprintf("^SELECT \\* FROM %s LIMIT 1 RETURNING \\*", _TEST_DB_TABLENAME)).
 		WillReturnRows(sqlmock.NewRows([]string{}))
-	numRowsAffected, err := q.ExecuteThenParseSingle(db, newTestModelEmpty())
+	found, err := q.ExecuteThenParseSingle(db, newTestModelEmpty())
 	if err != nil {
 		t.Errorf("Error in ExecuteThenParseList: %s", err.Error())
 		return
 	}
-	if numRowsAffected != 0 {
-		t.Errorf("Unexpected numRowsAffected (%d) != 0", numRowsAffected)
+	if found {
+		t.Errorf("Unexpected found = %t", found)
 		return
 	}
 

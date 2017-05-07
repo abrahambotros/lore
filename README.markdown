@@ -17,8 +17,8 @@ Aside from this, you're in charge of your own schema, migration, etc. - no full 
 
 Lastly, while I'm sure it could still be improved, I've tried (and will continue to try) to ensure documentation provides full transparency of what is going on, so that your lore is entirely in your control.
 
-## Quick-start and examples
-Below is a quick run-through of getting set up and constructing some simple examples. Check GoDoc documentation for more information on any item, and look through the test source files for more thorough examples of usage. I also recommend using string constants everywhere for your db field names (string literals everywhere are literally the devil and should be banned from your lore IMO - pun intended), but am just using literals here ONLY for simplicity and succinctness.
+## Guide and examples
+Below is a run-through of getting set up and constructing some simple examples. Check GoDoc/source documentation for more information on any item, and look through the test source files for more thorough examples of usage. I also recommend using string constants everywhere for your db field names (string literals everywhere are literally the devil and should be banned from your lore IMO - pun intended), but am just using literals here ONLY for simplicity and succinctness.
 
 ### Config
 When initializing your app, you should inform LORE of your desired config before constructing any LORE queries. To do so, you can use the `SetConfig` function and pass in a `*lore.Config`. Currently, this only determines the SQL placeholder format used in all Squirrel queries.
@@ -116,7 +116,7 @@ Now that we've built a `*lore.Query` and attached our SQL builder to it, we can 
 2. `*lore.Query.ExecuteThenParseSingle` - wraps sqlx.DB.Get
 3. `*lore.Query.ExecuteThenParseList` - wraps sqlx.DB.List
 
-All of these methods attempt to return the number of rows affected by the query, along with of course an error if one was encountered. See GoDoc for more details, especially regarding numRowsAffected (see comments for `Execute` in particular).
+All of these methods attempt to return the number of rows affected by the query, along with of course an error if one was encountered. See GoDoc/source for more details, especially regarding numRowsAffected (see comments for the `Execute` functions in particular).
 
 ```go
 /*
@@ -139,7 +139,7 @@ discoveredLegend.TellUsYourTale()
 ...
 
 /*
-Also try the other query wrappers listed below for creating your SQL... (See GoDoc for more
+Also try the other query wrappers listed below for creating your SQL... (See GoDoc/source for more
 details and possibly more functions)
 */
 q.SetSqlBuilder(
@@ -158,12 +158,26 @@ q.SetSqlBuilder(
 )
 ```
 
+### Convenience wrappers
+The functions below handle both building a SQL statement and executing it on the DB you supply, all in one easy call. For many typical use cases, you might find you can just call these and not worry about the intermediate steps (note that you don't even need to explicitly create a Query, though you still need to supply a config on app init!). See the GoDoc/source for more details of any particular function.
+
+```go
+lore.SelectModelByPrimaryKey
+lore.SelectModelsWhere
+lore.InsertNewModel
+lore.UpdateModelByPrimaryKey
+lore.UpdateSetMapWhere
+lore.DeleteModelByPrimaryKey
+lore.DeleteModelsWhere
+```
+
 ## DANGER: WIP
 LORE is a major WIP. Contributions are welcome, but use in production is cautioned against at the moment unless you know full well what you're doing!
 
 ## TODO
+* Augment convenience SQL-and-execute functions to call only Execute with no parse result if resultPtr is nil.
 * Allow using sqlx QueryRow/QueryRowX for large/unrestricted-length queries instead of just Get/Select.
-* Better tests, especially for Execute\* methods.
+* Better tests, especially for Execute\* methods and SQL-and-execute functions.
 * Consider better way to relate updates to SQL-builders to the parent query without having to call `SetSqlBuilder` every time.
 * Dedicated examples in GoDoc.
 

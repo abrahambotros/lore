@@ -176,6 +176,7 @@ LORE is a major WIP. Contributions are welcome, but use in production is caution
 
 ## TODO
 * Augment convenience SQL-and-execute functions to call only Execute with no parse result if resultPtr is nil.
+* Augment convenience SQL-and-execute functions with ORDER BY support.
 * Allow using sqlx QueryRow/QueryRowX for large/unrestricted-length queries instead of just Get/Select.
 * Better tests, especially for Execute\* methods and SQL-and-execute functions.
 * Consider better way to relate updates to SQL-builders to the parent query without having to call `SetSqlBuilder` every time.

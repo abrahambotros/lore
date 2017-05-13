@@ -40,7 +40,8 @@ scanning the result into resultSinglePtr. This is essentially a convenience wrap
 BuildSqlSelectStar and ExecuteThenParseSingle, applying the WHERE clause accordingly.
 
 Note that where is a pointer; if no where is desired, pass nil instead. When desired, this is
-typically something like a squirrel.Eq instance, etc.
+typically something like a squirrel.Eq instance, etc. For your convenience, you can use lore.Where
+to build a single Where-ish object around a squirrel.Eq/squirrel.Gt/etc.
 
 `SELECT * FROM <table> WHERE <where conditions> LIMIT 1;`
 */
@@ -137,7 +138,8 @@ scanning the result into resultListPtr. This is essentially a convenience wrappe
 BuildSqlUpdateSetMap and ExecuteThenParseList, applying the WHERE clause accordingly.
 
 Note that where is a pointer; if no where is desired, pass nil instead. When desired, this is
-typically something like a squirrel.Eq instance, etc.
+typically something like a squirrel.Eq instance, etc. For your convenience, you can use lore.Where
+to build a single Where-ish object around a squirrel.Eq/squirrel.Gt/etc.
 
 `UPDATE <table> SET <columns and values from map> WHERE <where conditions> RETURNING * ;`
 */
@@ -185,7 +187,8 @@ scanning the result into resultListPtr. This is essentially a convenience wrappe
 BuildSqlDelete and ExecuteThenParseList, applying the WHERE clause accordingly.
 
 Note that where is a pointer; if no where is desired, pass nil instead. When desired, this is
-typically something like a squirrel.Eq instance, etc.
+typically something like a squirrel.Eq instance, etc. For your convenience, you can use lore.Where
+to build a single Where-ish object around a squirrel.Eq/squirrel.Gt/etc.
 
 `DELETE FROM <table> WHERE <where conditions> RETURNING * ;`
 */

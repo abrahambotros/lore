@@ -15,20 +15,33 @@ type testModel struct {
 	Field int64 `db:"field"`
 }
 
+type testModelInvalid struct {
+	Id    int   `db:"id"`
+	Field int64 `db:"field"`
+}
+
 /*
 Enforce interface.
 */
 var _ ModelInterface = (*testModel)(nil)
+var _ ModelInterface = (*testModelInvalid)(nil)
 
 /*
-DbTableName implementation for ModelInterface.
+DbTableName implementation for testModel ModelInterface.
 */
 func (*testModel) DbTableName() string {
 	return _TEST_DB_TABLENAME
 }
 
 /*
-DbFieldMap implementation for ModelInterface.
+DbTableName implementation for testModelInvalid ModelInterface.
+*/
+func (*testModelInvalid) DbTableName() string {
+	return ""
+}
+
+/*
+DbFieldMap implementation for testModel ModelInterface.
 */
 func (tm *testModel) DbFieldMap() map[string]interface{} {
 	return map[string]interface{}{
@@ -37,17 +50,38 @@ func (tm *testModel) DbFieldMap() map[string]interface{} {
 }
 
 /*
-DbPrimaryFieldKey implementation for ModelInterface.
+DbFieldMap implementation for testModelInvalid ModelInterface.
+*/
+func (tm *testModelInvalid) DbFieldMap() map[string]interface{} {
+	return nil
+}
+
+/*
+DbPrimaryFieldKey implementation for testModel ModelInterface.
 */
 func (*testModel) DbPrimaryFieldKey() string {
 	return _TEST_DB_FIELDNAME_ID
 }
 
 /*
-DbPimraryFieldValue implementation for ModelInterface.
+DbPrimaryFieldKey implementation for testModelInvalid ModelInterface.
+*/
+func (*testModelInvalid) DbPrimaryFieldKey() string {
+	return ""
+}
+
+/*
+DbPrimaryFieldValue implementation for testModel ModelInterface.
 */
 func (tm *testModel) DbPrimaryFieldValue() interface{} {
 	return _TEST_MODEL_ID
+}
+
+/*
+DbPrimaryFieldValue implementation for testModelInvalid ModelInterface.
+*/
+func (tm *testModelInvalid) DbPrimaryFieldValue() interface{} {
+	return nil
 }
 
 /*
@@ -57,6 +91,17 @@ func createTestModelInstance() *testModel {
 	return &testModel{
 		Id:    _TEST_MODEL_ID,
 		Field: _TEST_MODEL_FIELD,
+	}
+}
+
+/*
+createTestModelInvalidInstance creates a new testModelInvalid instance. This should NOT block
+compilation, but SHOULD allow us to check invalid conditions at test time.
+*/
+func createTestModelInvalidInstance() *testModelInvalid {
+	return &testModelInvalid{
+		Id:    0,
+		Field: -1,
 	}
 }
 
@@ -88,6 +133,20 @@ func TestModelInterfaceInstance(t *testing.T) {
 	dbFieldMap := mi.DbFieldMap()
 	if len(dbFieldMap) != 1 || dbFieldMap[_TEST_DB_FIELDNAME_FIELD] != tm.Field {
 		t.Errorf("Invalid DbFieldMap: %+v", dbFieldMap)
+		return
+	}
+}
+
+/*
+TestInvalidModelInterfaceInstance tests the ModelInterface interface against an invalid model
+instance.
+*/
+func TestInvalidModelInterfaceInstance(t *testing.T) {
+	tm := createTestModelInvalidInstance()
+	var mi ModelInterface
+	mi = tm
+	if tm == nil || mi == nil {
+		t.Errorf("Expected non-nil ModelInterface instance, even if invalid")
 		return
 	}
 }

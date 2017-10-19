@@ -70,12 +70,18 @@ func TestExecute(t *testing.T) {
 		t.Errorf("Unexpected numRowsAffected (%d) != 1", numRowsAffected)
 		return
 	}
+	err = dbMock.ExpectationsWereMet()
+	if err != nil {
+		t.Error(err)
+		return
+	}
 }
 
 /*
 TestExecuteThenParseSingle tests the Query ExecuteThenParseSingle method using a mock db.
 
 TODO: Better testing of return result.
+TODO: Test invalid model interface.
 */
 func TestExecuteThenParseSingle(t *testing.T) {
 	// Build test query.

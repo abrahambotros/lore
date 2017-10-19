@@ -33,14 +33,14 @@ func TestExecuteUnexported(t *testing.T) {
 		q.BuildSqlSelectStar(),
 	)
 
-	// Test nil db handling.
+	// Test nil db resilience.
 	numRowsAffected, err := q.execute(nil, nil, _EXECUTE_MODE_NO_PARSE)
 	if numRowsAffected != 0 || err == nil {
 		t.Errorf("Expected 0 rows affected and non-empty err since nil db")
 		return
 	}
 
-	// Test invalid mode handling.
+	// Test invalid mode resilience.
 	numRowsAffected, err = q.execute(db, nil, 42)
 	if numRowsAffected != 0 || err == nil {
 		t.Errorf("Expected 0 rows affected and non-empty err since invalid mode")

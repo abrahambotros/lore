@@ -1,6 +1,28 @@
 package lore
 
-import "fmt"
+import (
+	"fmt"
+	"testing"
+)
+
+/*
+TestToSqlInvalid tests invalid inputs to the ToSql method.
+*/
+func TestToSqlInvalid(t *testing.T) {
+	// Build test query.
+	q := NewQuery(newTestModelEmpty())
+	q.SetSqlBuilder(
+		q.BuildSqlSelectStar(),
+	)
+
+	// Test nil sqlBuilder resilience.
+	q.sqlBuilder = nil
+	qSql, qSqlArgs, err := q.ToSql()
+	if qSql != "" || qSqlArgs != nil || err == nil {
+		t.Error("Expect empty qSql, nil qSqlArgs, and non-nil err since q.sqlBuilder is nil")
+		return
+	}
+}
 
 /*
 testBuildSqlHelper builds the SQL from the Query and compares it against the expected SQL and args.

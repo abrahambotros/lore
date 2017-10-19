@@ -78,3 +78,108 @@ func TestSelectModelsWhere(t *testing.T) {
 		return
 	}
 }
+
+/*
+TestInsertNewModel tests the InsertNewModel function.
+
+TODO: Find way to test args in a way that is robust to random changes in argument order injected via
+Squirrel.
+*/
+func TestInsertNewModel(t *testing.T) {
+	tm := createTestModelInstance()
+	db, dbMock := getTestSqlxDb(t)
+	dbMock.ExpectQuery(fmt.Sprintf(
+		"^INSERT INTO %s.*RETURNING \\*", _TEST_DB_TABLENAME,
+	))
+	InsertNewModel(tm, db, newTestModelEmpty())
+	err := dbMock.ExpectationsWereMet()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+/*
+TestUpdateModelByPrimaryKey tests the UpdateModelByPrimaryKey function.
+
+TODO: Find way to test args in a way that is robust to random changes in argument order injected via
+Squirrel.
+*/
+func TestUpdateModelByPrimaryKey(t *testing.T) {
+	tm := createTestModelInstance()
+	db, dbMock := getTestSqlxDb(t)
+	dbMock.ExpectQuery(fmt.Sprintf(
+		"^UPDATE %s SET .* WHERE %s.*RETURNING \\*", _TEST_DB_TABLENAME, _TEST_DB_FIELDNAME_ID,
+	))
+	UpdateModelByPrimaryKey(tm, db, newTestModelEmpty())
+	err := dbMock.ExpectationsWereMet()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+/*
+TestUpdateSetMapWhere tests the UpdateSetMapWhere function.
+*/
+func TestUpdateSetMapWhere(t *testing.T) {
+	tm := createTestModelInstance()
+	db, dbMock := getTestSqlxDb(t)
+	dbMock.ExpectQuery(fmt.Sprintf(
+		"^UPDATE %s SET %s =.* WHERE %s =.*RETURNING \\*",
+		_TEST_DB_TABLENAME,
+		_TEST_DB_FIELDNAME_FIELD,
+		_TEST_DB_FIELDNAME_ID,
+	)).WithArgs(_TEST_MODEL_FIELD+1, _TEST_MODEL_ID)
+	UpdateSetMapWhere(tm, db, map[string]interface{}{
+		_TEST_DB_FIELDNAME_FIELD: _TEST_MODEL_FIELD + 1,
+	}, newSqlPart(squirrel.Eq{
+		_TEST_DB_FIELDNAME_ID: _TEST_MODEL_ID,
+	}), newTestModelEmptyList())
+	err := dbMock.ExpectationsWereMet()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+/*
+TestDeleteModelByPrimaryKey tests the DeleteModelByPrimaryKey function.
+*/
+func TestDeleteModelByPrimaryKey(t *testing.T) {
+	tm := createTestModelInstance()
+	db, dbMock := getTestSqlxDb(t)
+	dbMock.ExpectQuery(fmt.Sprintf(
+		"^DELETE FROM %s WHERE %s =.*RETURNING \\*", _TEST_DB_TABLENAME, _TEST_DB_FIELDNAME_ID,
+	)).WithArgs(_TEST_MODEL_ID)
+	DeleteModelByPrimaryKey(tm, db, newTestModelEmpty())
+	err := dbMock.ExpectationsWereMet()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+/*
+TestDeleteModelsWhere tests the DeleteModelsWhere function.
+
+TODO: Find way to test multiple WHERE args in a way that is robust to random changes in argument
+order injected via Squirrel.
+*/
+func TestDeleteModelsWhere(t *testing.T) {
+	tm := createTestModelInstance()
+	db, dbMock := getTestSqlxDb(t)
+	dbMock.ExpectQuery(fmt.Sprintf(
+		"^DELETE FROM %s WHERE %s = .* RETURNING \\*",
+		_TEST_DB_TABLENAME,
+		_TEST_DB_FIELDNAME_FIELD,
+	)).WithArgs(_TEST_MODEL_FIELD)
+	DeleteModelsWhere(tm, db, newSqlPart(squirrel.Eq{
+		_TEST_DB_FIELDNAME_FIELD: _TEST_MODEL_FIELD,
+	}), newTestModelEmptyList())
+	err := dbMock.ExpectationsWereMet()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}

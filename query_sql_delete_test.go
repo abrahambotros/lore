@@ -65,5 +65,23 @@ func TestBuildSqlDeleteModelByPrimaryKey(t *testing.T) {
 		t.Error(err)
 		return
 	}
+}
 
+func TestBuildSqlDeleteModelByPrimaryKeyInvalid(t *testing.T) {
+	SetConfigDefault()
+	tm := createTestModelInvalidInstance()
+	q := NewQuery(tm)
+
+	// Ensure that primary key is empty for this invalid instance.
+	if tm.DbPrimaryFieldKey() != "" {
+		t.Error("Expected empty primary field key for testing")
+		return
+	}
+
+	// Expect error since empty primary key.
+	_, err := q.BuildSqlDeleteModelByPrimaryKey()
+	if err == nil {
+		t.Error("Expected non-nil err since invalid empty primary key", err)
+		return
+	}
 }

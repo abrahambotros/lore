@@ -76,3 +76,22 @@ func TestBuildSqlUpdateModelByPrimaryKey(t *testing.T) {
 		return
 	}
 }
+
+func TestBuildSqlUpdateModelByPrimaryKeyInvalid(t *testing.T) {
+	SetConfigDefault()
+	tm := createTestModelInvalidInstance()
+
+	// Ensure that primary key is empty for this invalid instance.
+	if tm.DbPrimaryFieldKey() != "" {
+		t.Error("Expected empty primary field key for testing")
+		return
+	}
+
+	// Expect error since empty primary key.
+	q := NewQuery(tm)
+	_, err := q.BuildSqlUpdateModelByPrimaryKey()
+	if err == nil {
+		t.Error("Expected non-nil err since invalid empty primary key", err)
+		return
+	}
+}

@@ -64,3 +64,22 @@ func TestBuildSqlInsertModel(t *testing.T) {
 		return
 	}
 }
+
+func TestBuildSqlInsertModelInvalid(t *testing.T) {
+	SetConfigDefault()
+	tm := createTestModelInvalidInstance()
+
+	// Ensure that nil DbFieldMap for this invalid instance.
+	if tm.DbFieldMap() != nil {
+		t.Error("Expected nil db field map for testing")
+		return
+	}
+
+	// Expect error since nil db field map.
+	q := NewQuery(tm)
+	_, err := q.BuildSqlInsertModel()
+	if err == nil {
+		t.Error("Expected non-nil err since nil DbFieldMap", err)
+		return
+	}
+}

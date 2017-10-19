@@ -22,6 +22,33 @@ func getTestSqlxDb(t *testing.T) (*sqlx.DB, sqlmock.Sqlmock) {
 }
 
 /*
+TestExecuteUnexported tests the (unexported) Query execute method.
+*/
+func TestExecuteUnexported(t *testing.T) {
+	db, _ := getTestSqlxDb(t)
+
+	// Build test query.
+	q := NewQuery(newTestModelEmpty())
+	q.SetSqlBuilder(
+		q.BuildSqlSelectStar(),
+	)
+
+	// Test nil db handling.
+	numRowsAffected, err := q.execute(nil, nil, _EXECUTE_MODE_NO_PARSE)
+	if numRowsAffected != 0 || err == nil {
+		t.Errorf("Expected 0 rows affected and non-empty err since nil db")
+		return
+	}
+
+	// Test invalid mode handling.
+	numRowsAffected, err = q.execute(db, nil, 42)
+	if numRowsAffected != 0 || err == nil {
+		t.Errorf("Expected 0 rows affected and non-empty err since invalid mode")
+		return
+	}
+}
+
+/*
 TestExecute tests the Query Execute method using a mock db.
 */
 func TestExecute(t *testing.T) {

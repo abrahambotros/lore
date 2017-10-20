@@ -11,9 +11,6 @@ func TestNewSqlPart(t *testing.T) {
 	newSqlPart(squirrel.Eq{
 		_TEST_DB_FIELDNAME_FIELD: _TEST_MODEL_FIELD,
 	})
-	newSqlPart(squirrel.Lt{
-		_TEST_DB_FIELDNAME_FIELD: _TEST_MODEL_FIELD,
-	})
 	newSqlPart(map[string]interface{}{
 		_TEST_DB_FIELDNAME_FIELD: _TEST_MODEL_FIELD,
 	})

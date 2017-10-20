@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/abrahambotros/lore?status.svg)](https://godoc.org/github.com/abrahambotros/lore)
 [![Build Status](https://travis-ci.org/abrahambotros/lore.svg)](https://travis-ci.org/abrahambotros/lore)
 [![Go Report Card](https://goreportcard.com/badge/github.com/abrahambotros/lore)](https://goreportcard.com/report/github.com/abrahambotros/lore)
-[![](https://cover.run/go/github.com/abrahambotros/lore.svg)](https://cover.run/go/github.com/abrahambotros/lore)
+[![gocover.io](https://gocover.io/_badge/github.com/abrahambotros/lore)](https://gocover.io/github.com/abrahambotros/lore)
 
 Light Object-Relational Environment (LORE) provides a simple and lightweight pseudo-ORM/pseudo-struct-mapping environment for Go.
 

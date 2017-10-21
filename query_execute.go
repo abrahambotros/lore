@@ -76,17 +76,19 @@ func (q *Query) execute(db *sqlx.DB, resultPtr interface{}, mode executeMode) (n
 	if db == nil {
 		return 0, errors.New("db cannot be nil")
 	}
-	if mode != _EXECUTE_MODE_NO_PARSE && mode != _EXECUTE_MODE_PARSE_SINGLE && mode != _EXECUTE_MODE_PARSE_LIST {
-		return 0, fmt.Errorf("Invalid execute mode: %d", mode)
-	}
-	if mode == _EXECUTE_MODE_PARSE_SINGLE {
+	switch mode {
+	case _EXECUTE_MODE_NO_PARSE:
+		break
+	case _EXECUTE_MODE_PARSE_SINGLE:
 		if !isPointer(resultPtr) || isPointerToSlice(resultPtr) {
 			return 0, fmt.Errorf("Result pointer cannot point to slice when in ParseSingle mode. ResultPtr: %+v", resultPtr)
 		}
-	} else if mode == _EXECUTE_MODE_PARSE_LIST {
+	case _EXECUTE_MODE_PARSE_LIST:
 		if !isPointer(resultPtr) || !isPointerToSlice(resultPtr) {
 			return 0, fmt.Errorf("Result pointer must point to slice when in ParseList mode. ResultPtr: %+v", resultPtr)
 		}
+	default:
+		return 0, fmt.Errorf("Invalid execute mode: %d", mode)
 	}
 
 	// Get SQL.
@@ -97,11 +99,12 @@ func (q *Query) execute(db *sqlx.DB, resultPtr interface{}, mode executeMode) (n
 
 	// Execute SQL with args on db.
 	var rawExecResult sql.Result
-	if mode == _EXECUTE_MODE_NO_PARSE {
+	switch mode {
+	case _EXECUTE_MODE_NO_PARSE:
 		rawExecResult, err = db.Exec(qSql, qSqlArgs...)
-	} else if mode == _EXECUTE_MODE_PARSE_SINGLE {
+	case _EXECUTE_MODE_PARSE_SINGLE:
 		err = db.Get(resultPtr, qSql, qSqlArgs...)
-	} else if mode == _EXECUTE_MODE_PARSE_LIST {
+	case _EXECUTE_MODE_PARSE_LIST:
 		err = db.Select(resultPtr, qSql, qSqlArgs...)
 	}
 
@@ -118,7 +121,8 @@ func (q *Query) execute(db *sqlx.DB, resultPtr interface{}, mode executeMode) (n
 	}
 
 	// Do any additional per-mode handling of result/return values.
-	if mode == _EXECUTE_MODE_NO_PARSE {
+	switch mode {
+	case _EXECUTE_MODE_NO_PARSE:
 		// If no-parse mode, then attempt using the raw sql.Result to determine number of rows
 		// affected
 		numRowsAffectedInt, err := rawExecResult.RowsAffected()
@@ -126,11 +130,11 @@ func (q *Query) execute(db *sqlx.DB, resultPtr interface{}, mode executeMode) (n
 			return 0, err
 		}
 		numRowsAffected = uint64(numRowsAffectedInt)
-	} else if mode == _EXECUTE_MODE_PARSE_SINGLE {
+	case _EXECUTE_MODE_PARSE_SINGLE:
 		// If single mode, then assuming sql.ErrNoRows was caught above, we must have retrieved a
 		// single result.
 		numRowsAffected = 1
-	} else if mode == _EXECUTE_MODE_PARSE_LIST {
+	case _EXECUTE_MODE_PARSE_LIST:
 		// Otherwise, if in multi mode, then explicitly count number of items returned via
 		// reflection, assuming the input was indeed a pointer to a slice.
 		numRowsAffected, err = getPointerSliceLength(resultPtr)

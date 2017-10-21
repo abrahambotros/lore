@@ -50,8 +50,13 @@ func TestSqlPartToSql(t *testing.T) {
 		_TEST_MODEL_FIELD,
 	)
 	sql, args, err = sp.ToSql()
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	if sql != fmt.Sprintf("%s = ?", _TEST_DB_FIELDNAME_FIELD) {
 		t.Errorf("Invalid sql generated: %s", sql)
+		return
 	}
 	arg0, ok = args[0].(int64)
 	if !ok {

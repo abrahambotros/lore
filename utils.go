@@ -7,8 +7,19 @@ import (
 )
 
 const (
-	STAR                   string = "*"
-	RETURNING_STAR         string = "RETURNING *"
+	/*
+		STAR provides a hard-coded constant string representing the common star/* character in SQL.
+	*/
+	STAR string = "*"
+	/*
+		RETURNING_STAR provides a hard-coded constant string representing the common "RETURNING *"
+		clause in SQL.
+	*/
+	RETURNING_STAR string = "RETURNING *"
+	/*
+		_ERR_EMPTY_PRIMARY_KEY provides a common error message used by this package to indicate an
+		empty primary key is found on a ModelInterface instance when a non-empty one is required.
+	*/
 	_ERR_EMPTY_PRIMARY_KEY string = "Empty primary key encountered; cannot perform functions requiring primary keys"
 )
 

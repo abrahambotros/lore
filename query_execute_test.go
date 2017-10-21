@@ -46,6 +46,40 @@ func TestExecuteUnexported(t *testing.T) {
 		t.Errorf("Expected 0 rows affected and non-empty err since invalid mode")
 		return
 	}
+
+	// Build test/mock db.
+	db, dbMock := getTestSqlxDb(t)
+
+	// Test single-row query.
+	rows := sqlmock.NewRows([]string{_TEST_DB_FIELDNAME_ID, _TEST_DB_FIELDNAME_FIELD}).
+		AddRow(_TEST_MODEL_ID, _TEST_MODEL_FIELD)
+	dbMock.ExpectQuery(fmt.Sprintf("^SELECT \\* FROM %s", _TEST_DB_TABLENAME)).
+		WillReturnRows(rows)
+	numRowsAffected, err = q.execute(db, newTestModelEmpty(), _EXECUTE_MODE_PARSE_SINGLE)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if numRowsAffected != 1 {
+		t.Errorf("Expect numRowsAffected equal to 1, but got: %d", numRowsAffected)
+		return
+	}
+
+	// Add another row and test multi-row query.
+	rows = sqlmock.NewRows([]string{_TEST_DB_FIELDNAME_ID, _TEST_DB_FIELDNAME_FIELD}).
+		AddRow(_TEST_MODEL_ID, _TEST_MODEL_FIELD).
+		AddRow(_TEST_MODEL_ID+1, _TEST_MODEL_FIELD+1)
+	dbMock.ExpectQuery(fmt.Sprintf("^SELECT \\* FROM %s", _TEST_DB_TABLENAME)).
+		WillReturnRows(rows)
+	numRowsAffected, err = q.execute(db, newTestModelEmptyList(), _EXECUTE_MODE_PARSE_LIST)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if numRowsAffected != 2 {
+		t.Errorf("Expect numRowsAffected equal to 2, but got: %d", numRowsAffected)
+		return
+	}
 }
 
 /*
